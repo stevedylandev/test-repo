@@ -3,49 +3,49 @@ name: Auto Release
 on:
   push:
     tags:
-      - 'v*'
+      - "v*"
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
-      with:
-        fetch-depth: 0
-    
-    - name: Get tag
-      id: tag
-      run: echo ::set-output name=TAG::${GITHUB_REF#refs/tags/}
-    
-    - name: Generate changelog
-      id: changelog
-      run: |
-        PREV_TAG=$(git describe --tags --abbrev=0 ${{ steps.tag.outputs.TAG }}^ 2>/dev/null || echo '')
-        if [ -z "$PREV_TAG" ]; then
-          git log --pretty=format:'%s' > CHANGELOG.md
-        else
-          git log $PREV_TAG..${{ steps.tag.outputs.TAG }} --pretty=format:'%s' > CHANGELOG.md
-        fi
-        
-        echo "## What's Changed" > RELEASE_NOTES.md
-        echo "### 🐛 Fixes" >> RELEASE_NOTES.md
-        grep -i '^fix:' CHANGELOG.md | sed 's/^fix: /* /' >> RELEASE_NOTES.md
-        echo "### ✨ Features" >> RELEASE_NOTES.md
-        grep -i '^feat:' CHANGELOG.md | sed 's/^feat: /* /' >> RELEASE_NOTES.md
-        echo "### 🧹 Chores" >> RELEASE_NOTES.md
-        grep -i '^chore:' CHANGELOG.md | sed 's/^chore: /* /' >> RELEASE_NOTES.md
-        
-        echo "RELEASE_NOTES<<EOF" >> $GITHUB_OUTPUT
-        cat RELEASE_NOTES.md >> $GITHUB_OUTPUT
-        echo "EOF" >> $GITHUB_OUTPUT
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 
-    - name: Create Release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        tag_name: ${{ steps.tag.outputs.TAG }}
-        release_name: Release ${{ steps.tag.outputs.TAG }}
-        body: ${{ steps.changelog.outputs.RELEASE_NOTES }}
-        draft: false
-        prerelease: false
+      - name: Get tag
+        id: tag
+        run: echo ::set-output name=TAG::${GITHUB_REF#refs/tags/}
+
+      - name: Generate changelog
+        id: changelog
+        run: |
+          PREV_TAG=$(git describe --tags --abbrev=0 ${{ steps.tag.outputs.TAG }}^ 2>/dev/null || echo '')
+          if [ -z "$PREV_TAG" ]; then
+            git log --pretty=format:'%s' > CHANGELOG.md
+          else
+            git log $PREV_TAG..${{ steps.tag.outputs.TAG }} --pretty=format:'%s' > CHANGELOG.md
+          fi
+
+          echo "## What's Changed" > RELEASE_NOTES.md
+          echo "### 🐛 Fixes" >> RELEASE_NOTES.md
+          grep -i '^fix:' CHANGELOG.md | sed 's/^fix: /* /' >> RELEASE_NOTES.md
+          echo "### ✨ Features" >> RELEASE_NOTES.md
+          grep -i '^feat:' CHANGELOG.md | sed 's/^feat: /* /' >> RELEASE_NOTES.md
+          echo "### 🧹 Chores" >> RELEASE_NOTES.md
+          grep -i '^chore:' CHANGELOG.md | sed 's/^chore: /* /' >> RELEASE_NOTES.md
+
+          echo "RELEASE_NOTES<<EOF" >> $GITHUB_OUTPUT
+          cat RELEASE_NOTES.md >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Create Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.tag.outputs.TAG }}
+          release_name: Release ${{ steps.tag.outputs.TAG }}
+          body: ${{ steps.changelog.outputs.RELEASE_NOTES }}
+          draft: false
+          prerelease: false

@@ -10,8 +10,6 @@
 
 ## Feature 3
 
-
 Fixed it
-
 
 some fix again

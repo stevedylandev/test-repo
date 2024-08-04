@@ -2,36 +2,36 @@ name: Prettier Check
 
 on:
   pull_request:
-    branches: [ main, master ]
+    branches: [main, master]
 
 jobs:
   prettier:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-    - name: Use Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: '14'
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "14"
 
-    - name: Install dependencies
-      run: npm ci
+      - name: Install dependencies
+        run: npm ci
 
-    - name: Check code formatting
-      run: npx prettier --check .
+      - name: Check code formatting
+        run: npx prettier --check .
 
-    - name: Comment PR
-      if: failure()
-      uses: actions/github-script@v6
-      with:
-        github-token: ${{secrets.GITHUB_TOKEN}}
-        script: |
-          github.rest.issues.createComment({
-            issue_number: context.issue.number,
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            body: '❌ Prettier check failed. Please run `prettier --write .` to fix formatting issues.'
-          })
+      - name: Comment PR
+        if: failure()
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '❌ Prettier check failed. Please run `prettier --write .` to fix formatting issues.'
+            })
