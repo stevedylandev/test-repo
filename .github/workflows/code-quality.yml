@@ -14,19 +14,8 @@ jobs:
       - name: Run Biome
         id: biome
         run: biome ci --formatter-enabled=true --linter-enabled=false --organize-imports-enabled=false src tests
-        continue-on-error: true
-      - name: Comment PR
+      - name: Add failure message
         if: failure()
-        uses: actions/github-script@v6
-        with:
-          github-token: ${{secrets.GITHUB_TOKEN}}
-          script: |
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.name,
-              body: 'The Code Quality check has failed. Please review the Biome output and make necessary corrections.'
-            })
-      - name: Exit with Biome's status
-        if: steps.biome.outcome != 'success'
-        run: exit 1
+        run: |
+          echo "## Code Quality Check Failed" >> $GITHUB_STEP_SUMMARY
+          echo "The Biome check has failed. Please review the output above and make necessary corrections." >> $GITHUB_STEP_SUMMARY
