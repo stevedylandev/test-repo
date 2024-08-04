@@ -5,6 +5,8 @@ on:
   pull_request:
 
 jobs:
+  build:
+    name: Code Quality
   quality:
     runs-on: ubuntu-latest
     steps:
