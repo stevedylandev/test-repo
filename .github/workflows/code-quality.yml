@@ -13,7 +13,7 @@ jobs:
           version: latest
       - name: Run Biome
         id: biome
-        run: biome ci --formatter-enabled=true --linter-enabled=false --organize-imports-enabled=false src tests
+        run: biome ci --formatter-enabled=true --linter-enabled=false --organize-imports-enabled=false .
       - name: Add failure message
         if: failure()
         run: |
